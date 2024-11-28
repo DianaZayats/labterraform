@@ -77,7 +77,7 @@ jobs:
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Plan
+       - name: Terraform Plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -113,5 +113,6 @@ jobs:
           IMAGE_NAME: zzzayats/order_stack
           IMAGE_TAG: latest
         run: |
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          docker push $IMAGE_NAME:$IMAGE_TAG
+          docker build -t zzzayats/order_stack .
+          docker push zzzayats/order_stack
+
