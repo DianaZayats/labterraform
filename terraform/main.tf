@@ -13,7 +13,20 @@ provider "aws" {
   region     = "us-east-1"
 }
 
+data "aws_security_group" "existing_web_app" {
+  filter {
+    name   = "group-name"
+    values = ["web_app"]
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = ["vpc-0afc3b8b4822b144c"]
+  }
+}
+
 resource "aws_security_group" "web_app" {
+  count       = length(data.aws_security_group.existing_web_app.id) > 0 ? 0 : 1
   name        = "web_app"
   description = "security group"
 
