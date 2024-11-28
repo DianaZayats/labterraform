@@ -83,7 +83,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           REPOSITORY_URI: ${{ secrets.REPOSITORY_URI }}
         id: plan
-        run: terraform plan -no-color -input=false -refresh=true -var="REPOSITORY_URI=${{ secrets.REPOSITORY_URI }}"
+        run: |
+          export REPOSITORY_URI=${{ secrets.REPOSITORY_URI }}
+          terraform plan -no-color -input=false -refresh=true -var="REPOSITORY_URI=${{ secrets.REPOSITORY_URI }}"
         working-directory: terraform
 
       - name: Terraform Apply
@@ -91,27 +93,28 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           REPOSITORY_URI: ${{ secrets.REPOSITORY_URI }}
-        run: terraform apply -auto-approve -var="REPOSITORY_URI=${{ secrets.REPOSITORY_URI }}"
+        run: |
+          terraform apply -auto-approve -var="REPOSITORY_URI=${{ secrets.REPOSITORY_URI }}"
         working-directory: terraform
 
   # Docker deploy job
-  docker_deploy:
-    runs-on: ubuntu-latest
-    needs: terraform  # Ensures this job runs after the Terraform job completes
+ # docker_deploy:
+   # runs-on: ubuntu-latest
+   # needs: terraform  # Ensures this job runs after the Terraform job completes
 
-    steps:
-      - uses: actions/checkout@v4
+   # steps:
+    #  - uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    #  - name: Login to Docker Hub
+     #   uses: docker/login-action@v2
+     #   with:
+     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #    password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push the tagged Docker image
-        env:
-          IMAGE_NAME: zzzayats/order_stack
-          IMAGE_TAG: latest
-        run: |
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          docker push $IMAGE_NAME:$IMAGE_TAG
+    #  - name: Build and push the tagged Docker image
+    #    env:
+     #     IMAGE_NAME: ${{ secrets.REPOSITORY_URI }}/flask-application
+     #     IMAGE_TAG: latest
+     #   run: |
+      #    docker build -t $IMAGE_NAME:$IMAGE_TAG .
+       #   docker push $IMAGE_NAME:$IMAGE_TAG
