@@ -6,19 +6,18 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  backend "s3" {
+    bucket         = "lab6.7-my-tf-state"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "my-lab6-tf-table"
+  }
 }
 
 # Configure the AWS provider
 provider "aws" {
   region = "us-east-1"
-}
-
-# S3 backend configuration
-backend "s3" {
-  bucket         = "lab6.7-my-tf-state"
-  key            = "terraform.tfstate"
-  region         = "us-east-1"
-  dynamodb_table = "my-lab6-tf-table"
 }
 
 # Data for existing security group
