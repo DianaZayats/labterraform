@@ -16,6 +16,14 @@ provider "aws" {
 resource "aws_security_group" "web_app" {
   name        = "web_app"
   description = "security group"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   ingress {
     from_port   = 80
     to_port     = 80
@@ -23,12 +31,6 @@ resource "aws_security_group" "web_app" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
- ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   egress {
     from_port   = 0
     to_port     = 65535
@@ -36,13 +38,13 @@ resource "aws_security_group" "web_app" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags= {
+  tags = {
     Name = "web_app"
   }
 }
 
 resource "aws_instance" "webapp_instance" {
-  ami           = "ami-001e362abd3e1d7b4"
+  ami           = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
   security_groups= ["web_app"]
   tags = {
