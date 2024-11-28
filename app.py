@@ -1,5 +1,5 @@
 from flask import Flask
-from order_stack import OrderStack  # Імпорт вашого класу OrderStack
+from order_stack import OrderStack  
 
 app = Flask(__name__)
 orders = OrderStack()
