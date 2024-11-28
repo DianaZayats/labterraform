@@ -102,6 +102,9 @@ resource "aws_lightsail_container_service_deployment_version" "flask_app_deploym
   container {
     container_name = "flask-application"
     image          = "${var.REPOSITORY_URI}:latest"
+    ports = {
+      8080 = "HTTP"
+    }
   }
 
   public_endpoint {
