@@ -15,15 +15,13 @@ terraform {
   }
 }
 
-# Declare the REPOSITORY_URI variable
-variable "REPOSITORY_URI" {
-  description = "URI of the Docker repository in AWS ECR"
-  type        = string
-}
-
-# Configure the AWS provider
 provider "aws" {
   region = "us-east-1"
+}
+
+# Variable for repository URI
+variable "REPOSITORY_URI" {
+  type = string
 }
 
 # Data for existing security group
@@ -82,25 +80,49 @@ resource "aws_instance" "webapp_instance" {
   }
 }
 
+# AWS Lightsail Container Service
+resource "aws_lightsail_container_service" "flask_app" {
+  name  = "flask-app"
+  power = "nano"
+  scale = 1
+
+  private_registry_access {
+    ecr_image_puller_role {
+      is_active = true
+    }
+  }
+
+  tags = {
+    version = "1.0.0"
+  }
+}
+
+# Deployment version
+resource "aws_lightsail_container_service_deployment_version" "flask_app_deployment" {
+  container {
+    container_name = "flask-application"
+    image          = "${var.REPOSITORY_URI}:latest"
+  }
+
+  public_endpoint {
+    container_name = "flask-application"
+    container_port = 8080
+
+    health_check {
+      healthy_threshold   = 2
+      unhealthy_threshold = 2
+      timeout_seconds     = 2
+      interval_seconds    = 5
+      path                = "/"
+      success_codes       = "200-499"
+    }
+  }
+
+  service_name = aws_lightsail_container_service.flask_app.name
+}
+
 # Output the public IP of the instance
 output "instance_public_ip" {
   value     = aws_instance.webapp_instance.public_ip
   sensitive = true
-}
-
-# New code to associate the repository URI with the deployment
-resource "aws_ecr_repository" "docker_repository" {
-  name = "flask_app_repository"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = {
-    Name = "flask_app_repository"
-  }
-}
-
-output "repository_url" {
-  value = aws_ecr_repository.docker_repository.repository_url
 }
