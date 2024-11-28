@@ -15,6 +15,12 @@ terraform {
   }
 }
 
+# Declare the REPOSITORY_URI variable
+variable "REPOSITORY_URI" {
+  description = "URI of the Docker repository in AWS ECR"
+  type        = string
+}
+
 # Configure the AWS provider
 provider "aws" {
   region = "us-east-1"
@@ -80,4 +86,21 @@ resource "aws_instance" "webapp_instance" {
 output "instance_public_ip" {
   value     = aws_instance.webapp_instance.public_ip
   sensitive = true
+}
+
+# New code to associate the repository URI with the deployment
+resource "aws_ecr_repository" "docker_repository" {
+  name = "flask_app_repository"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Name = "flask_app_repository"
+  }
+}
+
+output "repository_url" {
+  value = aws_ecr_repository.docker_repository.repository_url
 }
