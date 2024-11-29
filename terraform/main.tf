@@ -68,14 +68,24 @@ resource "aws_security_group" "web_app" {
 resource "aws_instance" "webapp_instance" {
   ami           = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
-  security_groups = ["web_app"]
+
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt-get update -y
+              sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+              curl -fsSL https://get.docker.com -o get-docker.sh
+              sudo sh get-docker.sh
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo docker pull zzayats/order_stack:latest
+              sudo docker run -d -p 80:80 zzayats/order_stack:latest
+              EOF
 
   tags = {
     Name = "webapp_instance"
   }
 }
 
-# Output the public IP of the instance
 output "instance_public_ip" {
   value     = aws_instance.webapp_instance.public_ip
   sensitive = true
