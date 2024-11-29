@@ -16,3 +16,4 @@ RUN python -m unittest discover -s . -p "test_*.py"
 EXPOSE 80
 
 CMD ["python", "app.py"]
+#test
